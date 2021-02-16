@@ -10,10 +10,10 @@ Flask-SQLAlchemy
 itsdangerous
 Jinja2
 Mako
-MarkupSafe==1.1.1
+MarkupSafe
 python-dateutil
 python-editor
-six==1.13.0
+six
 SQLAlchemy
 Werkzeug
 psycopg2
