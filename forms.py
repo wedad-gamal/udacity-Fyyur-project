@@ -7,15 +7,19 @@ from wtforms import (
     DateTimeField,
     widgets,
     BooleanField,
+    IntegerField,
+    ValidationError,
 )
 from wtforms.widgets import TextArea
 from wtforms.validators import DataRequired, AnyOf, URL
 from enum import Enum
+import phonenumbers
 
 
 class ShowForm(Form):
-    artist_id = StringField("artist_id")
-    venue_id = StringField("venue_id")
+
+    artist_id = IntegerField("artist_id")
+    venue_id = IntegerField("venue_id")
     start_time = DateTimeField(
         "start_time", validators=[DataRequired()], default=datetime.today()
     )
@@ -97,6 +101,17 @@ class Genres(Enum):
     Other = "Other"
 
 
+def validate_phone(self, field):
+    if len(field.data) != 10:
+        raise ValidationError("Invalid phone number.")
+    try:
+        input_number = phonenumbers.parse(field.data)
+        if not (phonenumbers.is_valid_number(input_number)):
+            raise ValidationError("Invalid phone number format")
+    except Exception as e:
+        print(e)
+
+
 class VenueForm(Form):
     name = StringField("name", validators=[DataRequired()])
     city = StringField("city", validators=[DataRequired()])
@@ -106,21 +121,22 @@ class VenueForm(Form):
         choices=[(member.value, name) for name, member in State.__members__.items()],
     )
     address = StringField("address", validators=[DataRequired()])
-    phone = StringField("phone")
+    phone = StringField("phone", validators=[validate_phone])
     image_link = StringField("image_link")
     genres = SelectMultipleField(
-        # TODO implement enum restriction
         "genres",
         validators=[DataRequired()],
         choices=[
             (member.value, member.value) for name, member in Genres.__members__.items()
         ],
     )
-    image_link = StringField("image_link", validators=[URL()])
-    website = StringField("website", validators=[URL()])
-    facebook_link = StringField("facebook_link", validators=[URL()])
+    image_link = StringField("image_link", validators=[DataRequired(), URL()])
+    website = StringField("website", validators=[DataRequired(), URL()])
+    facebook_link = StringField("facebook_link", validators=[DataRequired(), URL()])
     seeking_talent = BooleanField("Seeking talent")
-    seeking_description = StringField("seeking_description", widget=TextArea())
+    seeking_description = StringField(
+        "seeking_description", validators=[DataRequired()], widget=TextArea()
+    )
 
 
 class ArtistForm(Form):
@@ -132,12 +148,11 @@ class ArtistForm(Form):
         choices=[(member.value, name) for name, member in State.__members__.items()],
     )
     phone = StringField(
-        # TODO implement validation logic for state
-        "phone"
+        "phone",
+        validators=[DataRequired(), validate_phone],
     )
-    image_link = StringField("image_link")
+    image_link = StringField("image_link", validators=[DataRequired(), URL()])
     genres = SelectMultipleField(
-        # TODO implement enum restriction
         "genres",
         validators=[DataRequired()],
         choices=[
@@ -145,14 +160,12 @@ class ArtistForm(Form):
         ],
     )
     seeking_venue = BooleanField("Seeking venue")
-    seeking_description = StringField("seeking_description", widget=TextArea())
-    website = StringField("website", validators=[URL()])
+    seeking_description = StringField(
+        "seeking_description", validators=[DataRequired()], widget=TextArea()
+    )
+    website = StringField("website", validators=[DataRequired(), URL()])
 
     facebook_link = StringField(
-        # TODO implement enum restriction
         "facebook_link",
-        validators=[URL()],
+        validators=[DataRequired(), URL()],
     )
-
-
-# TODO IMPLEMENT NEW ARTIST FORM AND NEW SHOW FORM
