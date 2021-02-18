@@ -18,8 +18,19 @@ import phonenumbers
 
 class ShowForm(Form):
 
-    artist_id = IntegerField("artist_id")
-    venue_id = IntegerField("venue_id")
+    # artist_id = IntegerField("artist_id")
+    # venue_id = IntegerField("venue_id")
+    artist_id = SelectField("artist_id", validators=[DataRequired()], choices=[])
+    venue_id = SelectField("venue_id", validators=[DataRequired()], choices=[])
+    # artist_id.choices = [(a.id, a.name) for a in Artist.query.all()]
+
+    # def __init__(self, artists=None, venues=None):
+    #     super().__init__()
+    #     if artists:
+    #         self.artist_id.choices = [(a.id, a.name) for a in artists]
+    #     if venues:
+    #         self.venue_id.choices = [(v.id, v.name) for v in venues]
+
     start_time = DateTimeField(
         "start_time", validators=[DataRequired()], default=datetime.today()
     )

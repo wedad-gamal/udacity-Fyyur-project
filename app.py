@@ -495,13 +495,21 @@ def shows():
 
 @app.route("/shows/create")
 def create_shows():
+    # form = ShowForm()
+    # artists = Artist.query.all()
+    # venues = Venue.query.all()
     form = ShowForm()
+    form.artist_id.choices = [(artist.id, artist.name) for artist in Artist.query.all()]
+    form.venue_id.choices = [(venue.id, venue.name) for venue in Venue.query.all()]
     return render_template("forms/new_show.html", form=form)
 
 
 @app.route("/shows/create", methods=["POST"])
 def create_show_submission():
     form = ShowForm(request.form)
+    form.artist_id.choices = [(artist.id, artist.name) for artist in Artist.query.all()]
+    form.venue_id.choices = [(venue.id, venue.name) for venue in Venue.query.all()]
+
     if not form.validate():
         return render_template("forms/new_show.html", form=form)
     try:
